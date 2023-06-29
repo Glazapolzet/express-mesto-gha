@@ -1,0 +1,22 @@
+{
+  "name": "mesto-backend",
+  "version": "1.0.0",
+  "description": "Yandex.Practicum project",
+  "main": "app.js",
+  "scripts": {
+    "start": "PORT=3000 node app.js",
+    "dev": "nodemon app.js",
+    "lint": "npx eslint ."
+  },
+  "keywords": [],
+  "author": "vypz",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "nodemon": "^2.0.22"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
