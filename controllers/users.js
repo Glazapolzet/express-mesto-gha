@@ -53,32 +53,30 @@ const createUser = (req, res, next) => {
     });
 };
 
-const updateProfileInfo = (req, res, next) => {
-  const { name, about } = req.body;
-
+const updateProfile = (fields, validationErrorMessage) => (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
-    { name, about },
+    fields,
     {
       new: true,
       runValidators: true,
     },
   )
-    .then((profileInfo) => {
-      if (!profileInfo) {
+    .then((updatedFields) => {
+      if (!updatedFields) {
         res
           .status(NOT_FOUND_STATUS_CODE)
           .send({ message: 'Пользователь с указанным _id не найден' });
         return;
       }
 
-      res.send(profileInfo);
+      res.send(updatedFields);
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         res
           .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: 'Переданы некорректные данные при обновлении профиля' });
+          .send({ message: validationErrorMessage });
         return;
       }
 
@@ -86,37 +84,26 @@ const updateProfileInfo = (req, res, next) => {
     });
 };
 
+const updateProfileInfo = (req, res, next) => {
+  const { name, about } = req.body;
+
+  const updateInfo = updateProfile(
+    { name, about },
+    'Переданы некорректные данные при обновлении профиля',
+  );
+
+  updateInfo(req, res, next);
+};
+
 const updateProfileAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(
-    req.user._id,
+  const updateAvatar = updateProfile(
     { avatar },
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
-    .then((profileAvatar) => {
-      if (!profileAvatar) {
-        res
-          .status(NOT_FOUND_STATUS_CODE)
-          .send({ message: 'Пользователь с указанным _id не найден' });
-        return;
-      }
+    'Переданы некорректные данные при обновлении аватара',
+  );
 
-      res.send(profileAvatar);
-    })
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        res
-          .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: 'Переданы некорректные данные при обновлении аватара' });
-        return;
-      }
-
-      next(err);
-    });
+  updateAvatar(req, res, next);
 };
 
 module.exports = {
