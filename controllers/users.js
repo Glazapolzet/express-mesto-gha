@@ -1,22 +1,16 @@
 const mongoose = require('mongoose');
 const User = require('../models/user');
-const {
-  BAD_REQUEST_STATUS_CODE,
-  NOT_FOUND_STATUS_CODE,
-  INTERNAL_SERVER_ERROR_STATUS_CODE,
-} = require('../constants/constants');
+const { BAD_REQUEST_STATUS_CODE, NOT_FOUND_STATUS_CODE } = require('../constants/constants');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
     .catch((err) => {
-      res
-        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: 'Возникла проблема с сервером' });
+      next(err);
     });
 };
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   const { userId } = req.params;
 
   User.findById(userId)
@@ -24,7 +18,7 @@ const getUser = (req, res) => {
       if (!user) {
         res
           .status(NOT_FOUND_STATUS_CODE)
-          .send({ message: 'Запрашиваемый пользователь не найден' });
+          .send({ message: 'Пользователь с указанным _id не найден' });
         return;
       }
 
@@ -34,16 +28,14 @@ const getUser = (req, res) => {
       if (err instanceof mongoose.Error.CastError) {
         res
           .status(NOT_FOUND_STATUS_CODE)
-          .send({ message: 'Запрашиваемый пользователь не найден' });
+          .send({ message: 'Пользователь с указанным _id не найден' });
       }
 
-      res
-        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: 'Возникла проблема с сервером' });
+      next(err);
     });
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
@@ -56,13 +48,11 @@ const createUser = (req, res) => {
         return;
       }
 
-      res
-        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: 'Возникла проблема с сервером' });
+      next(err);
     });
 };
 
-const updateProfileInfo = (req, res) => {
+const updateProfileInfo = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
@@ -78,7 +68,7 @@ const updateProfileInfo = (req, res) => {
       if (!profileInfo) {
         res
           .status(NOT_FOUND_STATUS_CODE)
-          .send({ message: 'Запрашиваемый пользователь не найден' });
+          .send({ message: 'Пользователь с указанным _id не найден' });
         return;
       }
 
@@ -92,13 +82,11 @@ const updateProfileInfo = (req, res) => {
         return;
       }
 
-      res
-        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: 'Возникла проблема с сервером' });
+      next(err);
     });
 };
 
-const updateProfileAvatar = (req, res) => {
+const updateProfileAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -114,7 +102,7 @@ const updateProfileAvatar = (req, res) => {
       if (!profileAvatar) {
         res
           .status(NOT_FOUND_STATUS_CODE)
-          .send({ message: 'Запрашиваемый пользователь не найден' });
+          .send({ message: 'Пользователь с указанным _id не найден' });
         return;
       }
 
@@ -128,9 +116,7 @@ const updateProfileAvatar = (req, res) => {
         return;
       }
 
-      res
-        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: 'Возникла проблема с сервером' });
+      next(err);
     });
 };
 

@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
-const { PORT } = require('./constants/constants');
+const { PORT, INTERNAL_SERVER_ERROR_STATUS_CODE } = require('./constants/constants');
 
 const app = express();
 
@@ -22,6 +22,12 @@ app.use((req, res, next) => {
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
+app.use((err, req, res, next) => {
+  res
+    .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
+    .send({ message: 'Возникла проблема с сервером' });
+
+  next();
 });
+
+app.listen(PORT);

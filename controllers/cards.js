@@ -1,36 +1,62 @@
+const mongoose = require('mongoose');
 const Card = require('../models/card');
-const { INTERNAL_SERVER_ERROR_STATUS_CODE } = require('../constants/constants');
+const { BAD_REQUEST_STATUS_CODE, NOT_FOUND_STATUS_CODE } = require('../constants/constants');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => res.send(cards))
     .catch((err) => {
-      res
-        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
-        .send({ message: 'Возникла проблема с сервером' });
+      next(err);
     });
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => card.populate(['owner', 'likes']))
     .then((card) => res.send(card))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        res
+          .status(BAD_REQUEST_STATUS_CODE)
+          .send({ message: 'Переданы некорректные данные при создании карточки' });
+        return;
+      }
+
+      next(err);
+    });
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findByIdAndRemove(cardId)
     .populate(['owner', 'likes'])
-    .then((card) => res.send(card))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .then((card) => {
+      if (!card) {
+        res
+          .status(NOT_FOUND_STATUS_CODE)
+          .send({ message: 'Карточка с указанным _id не найдена' });
+        return;
+      }
+
+      res.send(card);
+    })
+    .catch((err) => {
+      if (err instanceof mongoose.Error.CastError) {
+        res
+          .status(NOT_FOUND_STATUS_CODE)
+          .send({ message: 'Карточка с указанным _id не найдена' });
+        return;
+      }
+
+      next(err);
+    });
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -38,18 +64,52 @@ const likeCard = (req, res) => {
   )
     .populate('likes')
     .then(({ likes }) => res.send(likes))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.CastError) {
+        res
+          .status(BAD_REQUEST_STATUS_CODE)
+          .send({ message: 'Переданы некорректные данные для постановки лайка' });
+        return;
+      }
+
+      if (err instanceof TypeError) {
+        res
+          .status(NOT_FOUND_STATUS_CODE)
+          .send({ message: 'Карточка с указанным _id не найдена' });
+        return;
+      }
+
+      next(err);
+    });
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
     .populate('likes')
-    .then((likes) => res.send(likes))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .then((likes) => {
+      if (!likes) {
+        res
+          .status(NOT_FOUND_STATUS_CODE)
+          .send({ message: 'Карточка с указанным _id не найдена' });
+        return;
+      }
+
+      res.send(likes);
+    })
+    .catch((err) => {
+      if (err instanceof mongoose.Error.CastError) {
+        res
+          .status(BAD_REQUEST_STATUS_CODE)
+          .send({ message: 'Переданы некорректные данные для снятия лайка' });
+        return;
+      }
+
+      next(err);
+    });
 };
 
 module.exports = {
