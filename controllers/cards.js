@@ -1,10 +1,15 @@
 const Card = require('../models/card');
+const { INTERNAL_SERVER_ERROR_STATUS_CODE } = require('../constants/constants');
 
 const getCards = (req, res) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      res
+        .status(INTERNAL_SERVER_ERROR_STATUS_CODE)
+        .send({ message: 'Возникла проблема с сервером' });
+    });
 };
 
 const createCard = (req, res) => {
