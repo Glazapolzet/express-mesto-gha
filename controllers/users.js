@@ -29,6 +29,7 @@ const getUser = (req, res, next) => {
         res
           .status(BAD_REQUEST_STATUS_CODE)
           .send({ message: 'Передан некорректный _id пользователя' });
+        return;
       }
 
       next(err);
@@ -61,7 +62,6 @@ const updateProfileInfo = (req, res, next) => {
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .then((profileInfo) => {
@@ -95,7 +95,6 @@ const updateProfileAvatar = (req, res, next) => {
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .then((profileAvatar) => {

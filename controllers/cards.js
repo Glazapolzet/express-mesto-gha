@@ -63,19 +63,21 @@ const likeCard = (req, res, next) => {
     { new: true },
   )
     .populate('likes')
-    .then(({ likes }) => res.send(likes))
+    .then((card) => {
+      if (!card) {
+        res
+          .status(NOT_FOUND_STATUS_CODE)
+          .send({ message: 'Карточка с указанным _id не найдена' });
+        return;
+      }
+
+      res.send(card.likes);
+    })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         res
           .status(BAD_REQUEST_STATUS_CODE)
           .send({ message: 'Переданы некорректные данные для постановки лайка' });
-        return;
-      }
-
-      if (err instanceof TypeError) {
-        res
-          .status(NOT_FOUND_STATUS_CODE)
-          .send({ message: 'Карточка с указанным _id не найдена' });
         return;
       }
 
