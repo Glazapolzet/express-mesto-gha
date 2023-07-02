@@ -27,8 +27,8 @@ const getUser = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         res
-          .status(NOT_FOUND_STATUS_CODE)
-          .send({ message: 'Пользователь с указанным _id не найден' });
+          .status(BAD_REQUEST_STATUS_CODE)
+          .send({ message: 'Передан некорректный _id пользователя' });
       }
 
       next(err);
