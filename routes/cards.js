@@ -10,7 +10,7 @@ router.post(
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
-      link: Joi.string().uri(),
+      link: Joi.string().required().uri(),
     }),
   }, {
     messages: {
@@ -23,8 +23,47 @@ router.post(
   }),
   createCard,
 );
-router.delete('/:cardId', deleteCard);
-router.put('/:cardId/likes', likeCard);
-router.delete('/:cardId/likes', dislikeCard);
+router.delete(
+  '/:cardId',
+  celebrate({
+    params: Joi.object().keys({
+      cardId: Joi.string().alphanum().length(24),
+    }),
+  }, {
+    messages: {
+      'string.alphanum': 'Параметр {#label} должен состоять из латинских букв или цифр',
+      'string.length': 'Параметр {#label} должен иметь длину {#limit} символов',
+    },
+  }),
+  deleteCard,
+);
+router.put(
+  '/:cardId/likes',
+  celebrate({
+    params: Joi.object().keys({
+      cardId: Joi.string().alphanum().length(24),
+    }),
+  }, {
+    messages: {
+      'string.alphanum': 'Параметр {#label} должен состоять из латинских букв или цифр',
+      'string.length': 'Параметр {#label} должен иметь длину {#limit} символов',
+    },
+  }),
+  likeCard,
+);
+router.delete(
+  '/:cardId/likes',
+  celebrate({
+    params: Joi.object().keys({
+      cardId: Joi.string().alphanum().length(24),
+    }),
+  }, {
+    messages: {
+      'string.alphanum': 'Параметр {#label} должен состоять из латинских букв или цифр',
+      'string.length': 'Параметр {#label} должен иметь длину {#limit} символов',
+    },
+  }),
+  dislikeCard,
+);
 
 module.exports = router;

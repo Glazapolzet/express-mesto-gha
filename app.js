@@ -19,7 +19,6 @@ app.use('/', router);
 
 app.use(errors());
 
-// app.use(celebrateErrorHandler);
 app.use(defaultErrorHandler);
 
 app.listen(PORT);

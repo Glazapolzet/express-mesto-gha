@@ -38,6 +38,19 @@ router.patch(
   updateProfileAvatar,
 );
 
-router.get('/:userId', getUser);
+router.get(
+  '/:userId',
+  celebrate({
+    params: Joi.object().keys({
+      userId: Joi.string().alphanum().length(24),
+    }),
+  }, {
+    messages: {
+      'string.alphanum': 'Параметр {#label} должен состоять из латинских букв или цифр',
+      'string.length': 'Параметр {#label} должен иметь длину {#limit} символов',
+    },
+  }),
+  getUser,
+);
 
 module.exports = router;

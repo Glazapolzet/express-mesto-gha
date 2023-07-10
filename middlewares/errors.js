@@ -1,15 +1,4 @@
-const { isCelebrateError } = require('celebrate');
-const BadRequestError = require('../errors/BadRequestError');
 const { INTERNAL_SERVER_ERROR_STATUS_CODE } = require('../constants/constants');
-
-const celebrateErrorHandler = (err, req, res, next) => {
-  if (isCelebrateError(err)) {
-    const [errDetails] = err.details.get('body').details;
-    return next(new BadRequestError(errDetails.message));
-  }
-
-  next(err);
-};
 
 const defaultErrorHandler = (err, req, res, next) => {
   const { statusCode = INTERNAL_SERVER_ERROR_STATUS_CODE, message } = err;
@@ -26,6 +15,5 @@ const defaultErrorHandler = (err, req, res, next) => {
 };
 
 module.exports = {
-  celebrateErrorHandler,
   defaultErrorHandler,
 };
