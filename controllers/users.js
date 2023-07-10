@@ -1,11 +1,32 @@
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-const { BAD_REQUEST_STATUS_CODE, NOT_FOUND_STATUS_CODE } = require('../constants/constants');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const ConflictError = require('../errors/ConflictError');
+const { JWT_SECRET } = require('../constants/constants');
 
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
+    .catch(next);
+};
+
+const getUserById = (userId) => (req, res, next) => {
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь с указанным _id не найден');
+      }
+
+      res.send(user);
+    })
     .catch((err) => {
+      if (err instanceof mongoose.Error.CastError) {
+        return next(new BadRequestError('Передан некорректный _id пользователя'));
+      }
+
       next(err);
     });
 };
@@ -13,49 +34,49 @@ const getUsers = (req, res, next) => {
 const getUser = (req, res, next) => {
   const { userId } = req.params;
 
-  User.findById(userId)
-    .then((user) => {
-      if (!user) {
-        res
-          .status(NOT_FOUND_STATUS_CODE)
-          .send({ message: 'Пользователь с указанным _id не найден' });
-        return;
-      }
+  const getSpecifiedUser = getUserById(userId);
 
-      res.send(user);
-    })
-    .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
-        res
-          .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: 'Передан некорректный _id пользователя' });
-        return;
-      }
+  getSpecifiedUser(req, res, next);
+};
 
-      next(err);
-    });
+const getProfile = (req, res, next) => {
+  const { _id: userId } = req.user;
+
+  const getSpecifiedProfile = getUserById(userId);
+
+  getSpecifiedProfile(req, res, next);
 };
 
 const createUser = (req, res, next) => {
-  const { name, about, avatar } = req.body;
+  const {
+    email, password, name, about, avatar,
+  } = req.body;
 
-  User.create({ name, about, avatar })
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        res
-          .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: 'Переданы некорректные данные при создании пользователя' });
-        return;
-      }
+  bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({
+        email, password: hash, name, about, avatar,
+      })
+        .then((user) => res.send(user.toObject({ useProjection: true })))
+        .catch((err) => {
+          if (err instanceof mongoose.Error.ValidationError) {
+            return next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
+          }
 
-      next(err);
+          if (err.code === 11000) {
+            return next(new ConflictError('Пользователь с таким email уже существует'));
+          }
+
+          next(err);
+        });
     });
 };
 
 const updateProfile = (fields, validationErrorMessage) => (req, res, next) => {
+  const { _id: userId } = req.user;
+
   User.findByIdAndUpdate(
-    req.user._id,
+    userId,
     fields,
     {
       new: true,
@@ -64,23 +85,17 @@ const updateProfile = (fields, validationErrorMessage) => (req, res, next) => {
   )
     .then((updatedFields) => {
       if (!updatedFields) {
-        res
-          .status(NOT_FOUND_STATUS_CODE)
-          .send({ message: 'Пользователь с указанным _id не найден' });
-        return;
+        throw new NotFoundError('Пользователь с указанным _id не найден');
       }
 
       res.send(updatedFields);
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res
-          .status(BAD_REQUEST_STATUS_CODE)
-          .send({ message: validationErrorMessage });
-        return;
+        return next(new BadRequestError(validationErrorMessage));
       }
 
-      next(err);
+      return next(err);
     });
 };
 
@@ -106,10 +121,34 @@ const updateProfileAvatar = (req, res, next) => {
   updateAvatar(req, res, next);
 };
 
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        JWT_SECRET,
+        { expiresIn: '7d' },
+      );
+
+      res
+        .cookie('token', token, {
+          maxAge: 604800,
+          httpOnly: true,
+          sameSite: true,
+        })
+        .send({ token });
+    })
+    .catch(next);
+};
+
 module.exports = {
   getUsers,
   getUser,
   createUser,
+  getProfile,
   updateProfileInfo,
   updateProfileAvatar,
+  login,
 };

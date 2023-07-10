@@ -1,43 +1,28 @@
-const { celebrate, Joi } = require('celebrate');
 const router = require('express').Router();
-const {
-  getUsers, getUser, updateProfileInfo, updateProfileAvatar, getProfile,
-} = require('../controllers/users');
+const { celebrate, Joi } = require('celebrate');
+const { createUser } = require('../controllers/users');
 
-router.get('/', getUsers);
-
-router.get('/me', getProfile);
-router.patch(
-  '/me',
+router.post(
+  '/',
   celebrate({
     body: Joi.object().keys({
+      email: Joi.string().required().email(),
+      password: Joi.string().required(),
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
+      avatar: Joi.string().uri(),
     }),
   }, {
     messages: {
       'string.empty': 'Поле {#label} не может быть пустым',
       'string.min': 'Длина поля {#label} должна быть не менее {#limit} символов',
       'string.max': 'Длина поля {#label} должна быть не более {#limit} символов',
-    },
-  }),
-  updateProfileInfo,
-);
-router.patch(
-  '/me/avatar',
-  celebrate({
-    body: Joi.object().keys({
-      avatar: Joi.string().uri(),
-    }),
-  }, {
-    messages: {
-      'string.empty': 'Поле {#label} не может быть пустым',
       'string.uri': 'Неверный формат ссылки у поля {#label}',
+      'string.email': 'Неверный формат почты у поля {#label}',
+      'any.required': 'Поле {#label} является обязательным',
     },
   }),
-  updateProfileAvatar,
+  createUser,
 );
-
-router.get('/:userId', getUser);
 
 module.exports = router;
