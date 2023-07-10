@@ -3,7 +3,8 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const { PORT } = require('./constants/constants');
 const router = require('./routes/index');
-const { celebrateErrorHandler, defaultErrorHandler } = require('./middlewares/errors');
+const { defaultErrorHandler } = require('./middlewares/errors');
+const { errors } = require('celebrate');
 
 const app = express();
 
@@ -16,9 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/', router);
 
-// app.use(errors());
+app.use(errors());
 
-app.use(celebrateErrorHandler);
+// app.use(celebrateErrorHandler);
 app.use(defaultErrorHandler);
 
 app.listen(PORT);
