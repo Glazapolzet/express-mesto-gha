@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const { createUser } = require('../controllers/users');
+const { URL_REGEX } = require('../constants/constants');
 
 router.post(
   '/',
@@ -10,11 +11,12 @@ router.post(
       password: Joi.string().required(),
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
-      avatar: Joi.string().uri(),
+      avatar: Joi.string().pattern(URL_REGEX, 'url'),
     }),
   }, {
     messages: {
       'string.empty': 'Поле {#label} не может быть пустым',
+      'string.pattern.name': 'Формат ссылки поля {#label} не соответствует шаблону {#name}',
       'string.min': 'Длина поля {#label} должна быть не менее {#limit} символов',
       'string.max': 'Длина поля {#label} должна быть не более {#limit} символов',
       'string.uri': 'Неверный формат ссылки у поля {#label}',

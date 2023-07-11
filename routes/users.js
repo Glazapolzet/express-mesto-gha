@@ -3,6 +3,7 @@ const router = require('express').Router();
 const {
   getUsers, getUser, updateProfileInfo, updateProfileAvatar, getProfile,
 } = require('../controllers/users');
+const {URL_REGEX} = require("../constants/constants");
 
 router.get('/', getUsers);
 
@@ -27,12 +28,12 @@ router.patch(
   '/me/avatar',
   celebrate({
     body: Joi.object().keys({
-      avatar: Joi.string().uri(),
+      avatar: Joi.string().pattern(URL_REGEX, 'url'),
     }),
   }, {
     messages: {
       'string.empty': 'Поле {#label} не может быть пустым',
-      'string.uri': 'Неверный формат ссылки у поля {#label}',
+      'string.pattern.name': 'Формат ссылки поля {#label} не соответствует шаблону {#name}',
     },
   }),
   updateProfileAvatar,

@@ -3,6 +3,7 @@ const { celebrate, Joi } = require('celebrate');
 const {
   getCards, createCard, deleteCard, likeCard, dislikeCard,
 } = require('../controllers/cards');
+const { URL_REGEX } = require('../constants/constants');
 
 router.get('/', getCards);
 router.post(
@@ -10,11 +11,12 @@ router.post(
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
-      link: Joi.string().required().uri(),
+      link: Joi.string().required().pattern(URL_REGEX, 'url'),
     }),
   }, {
     messages: {
       'string.empty': 'Поле {#label} не может быть пустым',
+      'string.pattern.name': 'Формат ссылки поля {#label} не соответствует шаблону {#name}',
       'string.min': 'Длина поля {#label} должна быть не менее {#limit} символов',
       'string.max': 'Длина поля {#label} должна быть не более {#limit} символов',
       'string.uri': 'Неверный формат ссылки у поля {#label}',
