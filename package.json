@@ -4,7 +4,7 @@
   "description": "Yandex.Practicum project",
   "main": "app.js",
   "scripts": {
-    "start": "PORT=3000 node app.js",
+    "start": "node app.js",
     "dev": "nodemon app.js",
     "lint": "npx eslint ."
   },
@@ -22,6 +22,8 @@
     "celebrate": "^15.0.1",
     "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
+    "express-rate-limit": "^6.7.1",
+    "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.1",
     "mongoose": "^7.3.1",
     "validator": "^13.9.0"

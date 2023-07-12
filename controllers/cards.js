@@ -22,7 +22,7 @@ const createCard = (req, res, next) => {
         return next(new BadRequestError('Переданы некорректные данные при создании карточки'));
       }
 
-      next(err);
+      return next(err);
     });
 };
 
@@ -42,8 +42,7 @@ const deleteCard = (req, res, next) => {
       }
 
       Card.findByIdAndRemove(cardId)
-        .populate(['owner', 'likes'])
-        .then((card) => res.send(card))
+        .then((deletedCard) => res.send(deletedCard))
         .catch(next);
     })
     .catch((err) => {
@@ -51,7 +50,7 @@ const deleteCard = (req, res, next) => {
         return next(new BadRequestError('Передан некорректный _id карточки'));
       }
 
-      next(err);
+      return next(err);
     });
 };
 
@@ -76,7 +75,7 @@ const likeCard = (req, res, next) => {
         return next(new BadRequestError('Передан некорректный _id карточки'));
       }
 
-      next(err);
+      return next(err);
     });
 };
 
@@ -101,7 +100,7 @@ const dislikeCard = (req, res, next) => {
         return next(new BadRequestError('Передан некорректный _id карточки'));
       }
 
-      next(err);
+      return next(err);
     });
 };
 

@@ -27,7 +27,7 @@ const getUserById = (userId) => (req, res, next) => {
         return next(new BadRequestError('Передан некорректный _id пользователя'));
       }
 
-      next(err);
+      return next(err);
     });
 };
 
@@ -67,8 +67,9 @@ const createUser = (req, res, next) => {
             return next(new ConflictError('Пользователь с таким email уже существует'));
           }
 
-          next(err);
-        });
+          return next(err);
+        })
+        .catch(next);
     });
 };
 

@@ -3,7 +3,7 @@ const router = require('express').Router();
 const {
   getUsers, getUser, updateProfileInfo, updateProfileAvatar, getProfile,
 } = require('../controllers/users');
-const {URL_REGEX} = require("../constants/constants");
+const { URL_REGEX } = require('../constants/constants');
 
 router.get('/', getUsers);
 
