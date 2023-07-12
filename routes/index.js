@@ -17,7 +17,7 @@ const limiter = rateLimit({
 
 const createAccountLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 5,
+  max: 25,
   message:
     'Поступило слишком много запросов на создание аккаунта с этого IP, повторите операцию через 1 час',
   standardHeaders: true,
