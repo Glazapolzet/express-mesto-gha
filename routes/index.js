@@ -26,6 +26,12 @@ const createAccountLimiter = rateLimit({
 
 router.use('/', limiter);
 
+router.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 router.use('/signin', signInRouter);
 router.use('/signup', createAccountLimiter);
 router.use('/signup', signUpRouter);

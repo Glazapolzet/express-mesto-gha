@@ -62,13 +62,13 @@ const likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .populate('likes')
+    .populate(['owner', 'likes'])
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка с указанным _id не найдена');
       }
 
-      res.send(card.likes);
+      res.send(card);
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
@@ -87,7 +87,7 @@ const dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .populate('likes')
+    .populate(['owner', 'likes'])
     .then((likes) => {
       if (!likes) {
         throw new NotFoundError('Карточка с указанным _id не найдена');
