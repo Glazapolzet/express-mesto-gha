@@ -8,8 +8,10 @@ const CONFLICT_STATUS_CODE = 409;
 const INTERNAL_SERVER_ERROR_STATUS_CODE = 500;
 
 const ALLOWED_ORIGINS = [
-  process.env.ALLOWED_ORIGIN_PROD,
-  process.env.ALLOWED_ORIGIN_DEV,
+  'http://vypz.praktikum.nomoredomains.xyz',
+  'https://vypz.praktikum.nomoredomains.xyz',
+  'http://localhost:3001',
+  'http://localhost:3000',
 ];
 
 module.exports = {
