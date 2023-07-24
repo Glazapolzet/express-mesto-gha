@@ -9,11 +9,15 @@ const cors = require('cors');
 const router = require('./routes/index');
 const { defaultErrorHandler } = require('./middlewares/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { ALLOWED_ORIGINS } = require('./constants/constants');
 
 const { PORT } = process.env;
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  credentials: true,
+  origin: ALLOWED_ORIGINS,
+}));
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
