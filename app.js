@@ -5,18 +5,17 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
+const cors = require('cors');
 const router = require('./routes/index');
 const { defaultErrorHandler } = require('./middlewares/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const cors = require('./middlewares/cors');
 
 const { PORT } = process.env;
 
 const app = express();
+app.use(cors());
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
-
-app.use(cors);
 
 app.use(helmet());
 app.use(cookieParser());
