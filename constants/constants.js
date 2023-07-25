@@ -1,7 +1,11 @@
-const { NODE_ENV, JWT_SECRET_PROD } = process.env;
+const {
+  NODE_ENV, JWT_SECRET_PROD, PUBLIC_DB_HOST, PUBLIC_PORT,
+} = process.env;
 
+const PORT = NODE_ENV === 'production' ? PUBLIC_PORT : 3000;
 const URL_REGEX = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9._~:/?#\[\]@!$&'()*+,;=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9._~:/?#\[\]@!$&'()*+,;=]*)$/;
 const JWT_SECRET = NODE_ENV === 'production' ? JWT_SECRET_PROD : 'secret-dummy-key';
+const DB_HOST = NODE_ENV === 'production' ? PUBLIC_DB_HOST : 'mongodb://localhost:27017/mestodb';
 
 const BAD_REQUEST_STATUS_CODE = 400;
 const UNAUTHORIZED_STATUS_CODE = 401;
@@ -18,8 +22,10 @@ const ALLOWED_ORIGINS = [
 ];
 
 module.exports = {
+  PORT,
   URL_REGEX,
   JWT_SECRET,
+  DB_HOST,
   BAD_REQUEST_STATUS_CODE,
   UNAUTHORIZED_STATUS_CODE,
   FORBIDDEN_STATUS_CODE,
