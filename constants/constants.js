@@ -1,4 +1,7 @@
+const { NODE_ENV, JWT_SECRET_PROD, JWT_SECRET_DEV } = process.env;
+
 const URL_REGEX = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9._~:/?#\[\]@!$&'()*+,;=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9._~:/?#\[\]@!$&'()*+,;=]*)$/;
+const JWT_SECRET = NODE_ENV === 'production' ? JWT_SECRET_PROD : JWT_SECRET_DEV;
 
 const BAD_REQUEST_STATUS_CODE = 400;
 const UNAUTHORIZED_STATUS_CODE = 401;
@@ -16,6 +19,7 @@ const ALLOWED_ORIGINS = [
 
 module.exports = {
   URL_REGEX,
+  JWT_SECRET,
   BAD_REQUEST_STATUS_CODE,
   UNAUTHORIZED_STATUS_CODE,
   FORBIDDEN_STATUS_CODE,
