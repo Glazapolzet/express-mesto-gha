@@ -1,7 +1,7 @@
-const { NODE_ENV, JWT_SECRET_PROD, JWT_SECRET_DEV } = process.env;
+const { NODE_ENV, JWT_SECRET_PROD } = process.env;
 
 const URL_REGEX = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9._~:/?#\[\]@!$&'()*+,;=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9._~:/?#\[\]@!$&'()*+,;=]*)$/;
-const JWT_SECRET = NODE_ENV === 'production' ? JWT_SECRET_PROD : JWT_SECRET_DEV;
+const JWT_SECRET = NODE_ENV === 'production' ? JWT_SECRET_PROD : 'secret-dummy-key';
 
 const BAD_REQUEST_STATUS_CODE = 400;
 const UNAUTHORIZED_STATUS_CODE = 401;
