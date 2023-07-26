@@ -19,7 +19,6 @@ router.post(
       'string.pattern.name': 'Формат ссылки поля {#label} не соответствует шаблону {#name}',
       'string.min': 'Длина поля {#label} должна быть не менее {#limit} символов',
       'string.max': 'Длина поля {#label} должна быть не более {#limit} символов',
-      'string.uri': 'Неверный формат ссылки у поля {#label}',
       'string.email': 'Неверный формат почты у поля {#label}',
       'any.required': 'Поле {#label} является обязательным',
     },

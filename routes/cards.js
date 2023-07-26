@@ -19,7 +19,6 @@ router.post(
       'string.pattern.name': 'Формат ссылки поля {#label} не соответствует шаблону {#name}',
       'string.min': 'Длина поля {#label} должна быть не менее {#limit} символов',
       'string.max': 'Длина поля {#label} должна быть не более {#limit} символов',
-      'string.uri': 'Неверный формат ссылки у поля {#label}',
       'any.required': 'Поле {#label} является обязательным',
     },
   }),
@@ -29,12 +28,13 @@ router.delete(
   '/:cardId',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().alphanum().length(24),
+      cardId: Joi.string().hex().length(24).required(),
     }),
   }, {
     messages: {
-      'string.alphanum': 'Параметр {#label} должен состоять из латинских букв или цифр',
+      'string.hex': 'Параметр {#label} должен состоять из латинских букв или цифр',
       'string.length': 'Параметр {#label} должен иметь длину {#limit} символов',
+      'any.required': 'Поле {#label} является обязательным',
     },
   }),
   deleteCard,
@@ -43,12 +43,13 @@ router.put(
   '/:cardId/likes',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().alphanum().length(24),
+      cardId: Joi.string().hex().length(24).required(),
     }),
   }, {
     messages: {
-      'string.alphanum': 'Параметр {#label} должен состоять из латинских букв или цифр',
+      'string.hex': 'Параметр {#label} должен состоять из латинских букв или цифр',
       'string.length': 'Параметр {#label} должен иметь длину {#limit} символов',
+      'any.required': 'Поле {#label} является обязательным',
     },
   }),
   likeCard,
@@ -57,12 +58,13 @@ router.delete(
   '/:cardId/likes',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().alphanum().length(24),
+      cardId: Joi.string().hex().length(24).required(),
     }),
   }, {
     messages: {
-      'string.alphanum': 'Параметр {#label} должен состоять из латинских букв или цифр',
+      'string.hex': 'Параметр {#label} должен состоять из латинских букв или цифр',
       'string.length': 'Параметр {#label} должен иметь длину {#limit} символов',
+      'any.required': 'Поле {#label} является обязательным',
     },
   }),
   dislikeCard,
